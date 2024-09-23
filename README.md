@@ -44,43 +44,60 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 ```
 ### Setup Function
-The setup() function is executed once at the beginning. It connects to the Wi-Fi network, sets up the MQTT server and port, connects to the MQTT broker, and publishes the chip ID to the specified topic.
+The `setup()` function is executed once at the beginning. It connects to the Wi-Fi network, sets up the MQTT server and port, connects to the MQTT broker, and publishes the chip ID to the specified topic.
 
 ```cpp
 void setup() {
-  // Connect to Wi-Fi network
+  Serial.begin(115200);
+  connectToWifi(ssid, password);
+  initMqtt(mqttServer, mqttPort);
+}
+```
+
+### connectToWifi Function
+The `connectToWifi()` function establishes a connection between the client and the Wi-Fi network.
+```cpp
+void connectToWifi(const char* ssid, const char* password){
+  Serial.println();
+
   WiFi.begin(ssid, password);
 
+  Serial.print("Connecting to WIFI");
   while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Connecting to WiFi...");
+    delay(500);
+    Serial.print(".");
   }
+  Serial.println();
 
-  Serial.println("Connected to WiFi");
+  Serial.print("Connected, IP address: ");
+  Serial.println(WiFi.localIP());
+}
+```
 
-  // Set up MQTT server and port
-  client.setServer(mqttServer, mqttPort);
+### initMqtt Function
+The `initMqtt()` function is designed to initialize the MQTT client and establishing a connection to the specified MQTT broker.
+```cpp
+void initMqtt(const char* server, int port){
+  // Set the broker server adress and port
+  client.setServer(server, port);
+  // Set the callback
+  client.setCallback(callback);
 
-  // Connect to MQTT broker
+
+  // Connect to the broker.
   while (!client.connected()) {
     if (client.connect("ESP8266Client")) {
       Serial.println("Connected to MQTT broker");
     } else {
-      Serial.print("Failed to connect to MQTT broker, retrying in 5 seconds...");
+      Serial.println("Failed to connect to MQTT broker, retrying in 5 seconds...");
       delay(5000);
     }
   }
-
-  // Get and publish chip ID
-  char chipId[12];
-  sprintf(chipId, "%06X", ESP.getChipId());
-  client.publish(mqttTopic, chipId);
-}
 ```
 
 ### Loop Function
 
-The loop() function runs repeatedly after the setup() function. It calls the client.loop() method to maintain the MQTT connection.
+The `loop()` function runs repeatedly after the setup() function. It calls the client.loop() method to maintain the MQTT connection.
 
 ```cpp
 void loop() {
