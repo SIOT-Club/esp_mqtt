@@ -17,6 +17,7 @@ void connectToWifi(const char* ssid, const char* password);
 void initMqtt(const char* server, int port);
 
 void setup() {
+  Serial.begin(115200);
   // Menghubungkan ke jaringan Wi-Fi
   connectToWifi(ssid, password);
   // Menghubungkan ke Broker MQTT
@@ -63,7 +64,7 @@ void initMqtt(const char* server, int port){
     if (client.connect("ESP8266Client")) {
       Serial.println("Connected to MQTT broker");
     } else {
-      Serial.print("Failed to connect to MQTT broker, retrying in 5 seconds...");
+      Serial.println("Failed to connect to MQTT broker, retrying in 5 seconds...");
       delay(5000);
     }
   }

@@ -48,6 +48,7 @@ The `setup()` function is executed once at the beginning. It connects to the Wi-
 
 ```cpp
 void setup() {
+  Serial.begin(115200);
   connectToWifi(ssid, password);
   initMqtt(mqttServer, mqttPort);
 }
@@ -88,7 +89,7 @@ void initMqtt(const char* server, int port){
     if (client.connect("ESP8266Client")) {
       Serial.println("Connected to MQTT broker");
     } else {
-      Serial.print("Failed to connect to MQTT broker, retrying in 5 seconds...");
+      Serial.println("Failed to connect to MQTT broker, retrying in 5 seconds...");
       delay(5000);
     }
   }
